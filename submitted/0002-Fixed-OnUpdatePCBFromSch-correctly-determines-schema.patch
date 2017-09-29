@@ -1,0 +1,26 @@
+From feeb09d85da191845bf1cf472956fd9e744dd887 Mon Sep 17 00:00:00 2001
+From: danngreen <danngreen1@gmail.com>
+Date: Mon, 25 Sep 2017 15:54:46 -0700
+Subject: [PATCH] Fixed OnUpdatePCBFromSch correctly determines schematic name
+ if project name contains a period
+
+---
+ pcbnew/pcbframe.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pcbnew/pcbframe.cpp b/pcbnew/pcbframe.cpp
+index c0b7f0fb1..00d40193c 100644
+--- a/pcbnew/pcbframe.cpp
++++ b/pcbnew/pcbframe.cpp
+@@ -1192,7 +1192,7 @@ void PCB_EDIT_FRAME::OnUpdatePCBFromSch( wxCommandEvent& event )
+         KIWAY_PLAYER* frame = Kiway().Player( FRAME_SCH, true );
+         wxFileName schfn = Prj().AbsolutePath( Prj().GetProjectName() );
+ 
+-        schfn.SetExt( SchematicFileExtension );
++        schfn.SetFullName( wxString::Format( _( "%s.%s" ), schfn.GetFullName(), SchematicFileExtension ) );
+ 
+         if( !frame->IsVisible() )
+         {
+-- 
+2.11.0
+

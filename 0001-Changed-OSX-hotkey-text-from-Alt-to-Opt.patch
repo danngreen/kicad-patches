@@ -1,0 +1,67 @@
+From 2dfe00730beaa0d317b1d071af4fdd87ed9bc907 Mon Sep 17 00:00:00 2001
+From: danngreen <danngreen1@gmail.com>
+Date: Fri, 29 Sep 2017 13:53:42 -0700
+Subject: [PATCH] Changed OSX hotkey text from "Alt" to "Opt"
+
+---
+ common/hotkeys_basic.cpp | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/common/hotkeys_basic.cpp b/common/hotkeys_basic.cpp
+index db69e219c..b7e55ff50 100644
+--- a/common/hotkeys_basic.cpp
++++ b/common/hotkeys_basic.cpp
+@@ -143,12 +143,15 @@ static struct hotkey_name_descr hotkeyNameList[] =
+ 
+ #ifdef USING_MAC_CMD
+ #define MODIFIER_CTRL       wxT( "Cmd+" )
++#define MODIFIER_ALT        wxT( "Opt+" )
+ #else
+ #define MODIFIER_CTRL       wxT( "Ctrl+" )
++#define MODIFIER_ALT        wxT( "Alt+" )
+ #endif
+ #define MODIFIER_CMD_MAC    wxT( "Cmd+" )
+ #define MODIFIER_CTRL_BASE  wxT( "Ctrl+" )
+-#define MODIFIER_ALT        wxT( "Alt+" )
++#define MODIFIER_OPT_MAC    wxT( "Opt+" )
++#define MODIFIER_ALT_BASE   wxT( "Alt+" )
+ #define MODIFIER_SHIFT      wxT( "Shift+" )
+ 
+ 
+@@ -276,6 +279,7 @@ wxString AddHotkeyName( const wxString& aText, EDA_HOTKEY** aList,
+     // On OSX, the modifier equivalent to the Ctrl key of PCs
+     // is the Cmd key, but in code we should use Ctrl as prefix in menus
+     msg.Replace( MODIFIER_CMD_MAC, MODIFIER_CTRL_BASE );
++    msg.Replace( MODIFIER_OPT_MAC, MODIFIER_ALT_BASE );
+ #endif
+ 
+     return msg;
+@@ -334,6 +338,7 @@ wxString AddHotkeyName( const wxString&           aText,
+     // On OSX, the modifier equivalent to the Ctrl key of PCs
+     // is the Cmd key, but in code we should use Ctrl as prefix in menus
+     msg.Replace( MODIFIER_CMD_MAC, MODIFIER_CTRL_BASE );
++    msg.Replace( MODIFIER_OPT_MAC, MODIFIER_ALT_BASE );
+ #endif
+ 
+     return msg;
+@@ -398,10 +403,15 @@ int KeyCodeFromKeyName( const wxString& keyname )
+             modifier |= GR_KB_CTRL;
+             prefix = MODIFIER_CMD_MAC;
+         }
+-        else if( key.StartsWith( MODIFIER_ALT ) )
++        else if( key.StartsWith( MODIFIER_ALT_BASE ) )
++        {
++            modifier |= GR_KB_ALT;
++            prefix = MODIFIER_ALT_BASE;
++        }
++        else if( key.StartsWith( MODIFIER_OPT_MAC ) )
+         {
+             modifier |= GR_KB_ALT;
+-            prefix = MODIFIER_ALT;
++            prefix = MODIFIER_OPT_MAC;
+         }
+         else if( key.StartsWith( MODIFIER_SHIFT ) )
+         {
+-- 
+2.11.0
+

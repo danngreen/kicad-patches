@@ -1,0 +1,142 @@
+From f96623e853f360706d438ea7f7af789abdd55eaa Mon Sep 17 00:00:00 2001
+From: danngreen <danngreen1@gmail.com>
+Date: Thu, 14 Sep 2017 09:04:30 -0700
+Subject: [PATCH 1/2] Clarify Selection text menu items changed so that strings
+ which match on-screen text are displayed first. Also added Non-ortho. to
+ Schematic Line element
+
+---
+ eeschema/lib_field.cpp     | 6 +++---
+ eeschema/lib_text.cpp      | 2 +-
+ eeschema/sch_component.cpp | 2 +-
+ eeschema/sch_field.cpp     | 2 +-
+ eeschema/sch_line.cpp      | 2 ++
+ eeschema/sch_sheet_pin.cpp | 2 +-
+ eeschema/sch_text.cpp      | 8 ++++----
+ 7 files changed, 13 insertions(+), 11 deletions(-)
+
+diff --git a/eeschema/lib_field.cpp b/eeschema/lib_field.cpp
+index cd7e524b6..8a6ba9ffd 100644
+--- a/eeschema/lib_field.cpp
++++ b/eeschema/lib_field.cpp
+@@ -707,9 +707,9 @@ void LIB_FIELD::SetText( const wxString& aText )
+ 
+ wxString LIB_FIELD::GetSelectMenuText() const
+ {
+-    return wxString::Format( _( "Field %s %s" ),
+-                             GetChars( GetName() ),
+-                             GetChars( ShortenedShownText() ) );
++    return wxString::Format( _( "%s (%s)" ),
++                             GetChars( ShortenedShownText() ),
++                             GetChars( GetName() ) );
+ }
+ 
+ 
+diff --git a/eeschema/lib_text.cpp b/eeschema/lib_text.cpp
+index 428a28d0f..dd05a7503 100644
+--- a/eeschema/lib_text.cpp
++++ b/eeschema/lib_text.cpp
+@@ -505,7 +505,7 @@ void LIB_TEXT::SetText( const wxString& aText )
+ wxString LIB_TEXT::GetSelectMenuText() const
+ {
+     wxString msg;
+-    msg.Printf( _( "Graphic Text %s" ), GetChars( ShortenedShownText() ) );
++    msg.Printf( _( "%s (Graphic Text)" ), GetChars( ShortenedShownText() ) );
+     return msg;
+ }
+ 
+diff --git a/eeschema/sch_component.cpp b/eeschema/sch_component.cpp
+index 77ff9477c..418b64f34 100644
+--- a/eeschema/sch_component.cpp
++++ b/eeschema/sch_component.cpp
+@@ -2019,7 +2019,7 @@ LIB_ITEM* SCH_COMPONENT::GetDrawItem( const wxPoint& aPosition, KICAD_T aType )
+ wxString SCH_COMPONENT::GetSelectMenuText() const
+ {
+     wxString tmp;
+-    tmp.Printf( _( "Component %s, %s" ),
++    tmp.Printf( _( "%s Component (%s)" ),
+                 GetChars( GetLibId().GetLibItemName() ),
+                 GetChars( GetField( REFERENCE )->GetShownText() ) );
+     return tmp;
+diff --git a/eeschema/sch_field.cpp b/eeschema/sch_field.cpp
+index a141d5eb4..beb2415a6 100644
+--- a/eeschema/sch_field.cpp
++++ b/eeschema/sch_field.cpp
+@@ -464,7 +464,7 @@ void SCH_FIELD::Rotate( wxPoint aPosition )
+ wxString SCH_FIELD::GetSelectMenuText() const
+ {
+     wxString tmp;
+-    tmp.Printf( _( "Field %s" ), GetChars( GetName() ) );
++    tmp.Printf( _( "%s (%s)" ), GetChars( ShortenedShownText() ), GetChars( GetName() ) );
+ 
+     return tmp;
+ }
+diff --git a/eeschema/sch_line.cpp b/eeschema/sch_line.cpp
+index 48c3cb397..943aa3ec9 100644
+--- a/eeschema/sch_line.cpp
++++ b/eeschema/sch_line.cpp
+@@ -458,6 +458,8 @@ wxString SCH_LINE::GetSelectMenuText() const
+         orient = _("Vert.");
+     else if( m_start.y == m_end.y )
+         orient = _("Horiz.");
++    else
++        orient = _("Non-ortho.");
+ 
+     switch( m_Layer )
+     {
+diff --git a/eeschema/sch_sheet_pin.cpp b/eeschema/sch_sheet_pin.cpp
+index 2cf56e642..ff23829e0 100644
+--- a/eeschema/sch_sheet_pin.cpp
++++ b/eeschema/sch_sheet_pin.cpp
+@@ -499,7 +499,7 @@ void SCH_SHEET_PIN::GetEndPoints( std::vector <DANGLING_END_ITEM>& aItemList )
+ wxString SCH_SHEET_PIN::GetSelectMenuText() const
+ {
+     wxString tmp;
+-    tmp.Printf( _( "Hierarchical Sheet Pin %s" ), GetChars( ShortenedShownText() ) );
++    tmp.Printf( _( "%s (Hierarchical Sheet Pin)" ), GetChars( ShortenedShownText() ) );
+     return tmp;
+ }
+ 
+diff --git a/eeschema/sch_text.cpp b/eeschema/sch_text.cpp
+index 10d55acd5..488272850 100644
+--- a/eeschema/sch_text.cpp
++++ b/eeschema/sch_text.cpp
+@@ -614,7 +614,7 @@ const EDA_RECT SCH_TEXT::GetBoundingBox() const
+ wxString SCH_TEXT::GetSelectMenuText() const
+ {
+     wxString msg;
+-    msg.Printf( _( "Graphic Text %s" ), GetChars( ShortenedShownText() ) );
++    msg.Printf( _( "%s (Graphic Text)" ), GetChars( ShortenedShownText() ) );
+     return msg;
+ }
+ 
+@@ -1012,7 +1012,7 @@ const EDA_RECT SCH_LABEL::GetBoundingBox() const
+ wxString SCH_LABEL::GetSelectMenuText() const
+ {
+     wxString msg;
+-    msg.Printf( _( "Label %s" ), GetChars( ShortenedShownText() ) );
++    msg.Printf( _( "%s (Label)" ), GetChars( ShortenedShownText() ) );
+     return msg;
+ }
+ 
+@@ -1475,7 +1475,7 @@ const EDA_RECT SCH_GLOBALLABEL::GetBoundingBox() const
+ wxString SCH_GLOBALLABEL::GetSelectMenuText() const
+ {
+     wxString msg;
+-    msg.Printf( _( "Global Label %s" ), GetChars( ShortenedShownText() ) );
++    msg.Printf( _( "%s (Global Label)" ), GetChars( ShortenedShownText() ) );
+     return msg;
+ }
+ 
+@@ -1833,7 +1833,7 @@ void SCH_HIERLABEL::Rotate( wxPoint aPosition )
+ wxString SCH_HIERLABEL::GetSelectMenuText() const
+ {
+     wxString msg;
+-    msg.Printf( _( "Hierarchical Label %s" ), GetChars( ShortenedShownText() ) );
++    msg.Printf( _( "%s (Hierarchical Label)" ), GetChars( ShortenedShownText() ) );
+     return msg;
+ }
+ 
+-- 
+2.11.0
+

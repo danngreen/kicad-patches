@@ -1,0 +1,151 @@
+From e83b33cbac66ba8afd72e867cf0f1d163b294f2b Mon Sep 17 00:00:00 2001
+From: danngreen <danngreen1@gmail.com>
+Date: Thu, 28 Sep 2017 13:08:15 -0700
+Subject: [PATCH] Clarify Selection items enumerated in all instances.
+
+Showing more info for SCH_FIELD and SCH_LINE items
+---
+ eeschema/controle.cpp             |  3 ++-
+ eeschema/libeditframe.cpp         |  3 ++-
+ eeschema/sch_field.cpp            |  4 +++-
+ eeschema/sch_line.cpp             | 11 +++++++----
+ gerbview/tools/selection_tool.cpp |  3 ++-
+ pcbnew/controle.cpp               |  3 ++-
+ pcbnew/modedit.cpp                |  3 ++-
+ 7 files changed, 20 insertions(+), 10 deletions(-)
+
+diff --git a/eeschema/controle.cpp b/eeschema/controle.cpp
+index 82f2ca0a7..5bc657052 100644
+--- a/eeschema/controle.cpp
++++ b/eeschema/controle.cpp
+@@ -181,8 +181,9 @@ SCH_ITEM* SCH_EDIT_FRAME::LocateItem( const wxPoint& aPosition, const KICAD_T aF
+             for( int i = 0;  i < m_collectedItems.GetCount() && i < MAX_SELECT_ITEM_IDS;  i++ )
+             {
+                 wxString text = m_collectedItems[i]->GetSelectMenuText();
++                wxString menuText = wxString::Format( "&%d. %s", i + 1, text);
+                 BITMAP_DEF xpm = m_collectedItems[i]->GetMenuImage();
+-                AddMenuItem( &selectMenu, ID_SELECT_ITEM_START + i, text, KiBitmap( xpm ) );
++                AddMenuItem( &selectMenu, ID_SELECT_ITEM_START + i, menuText, KiBitmap( xpm ) );
+             }
+ 
+             // Set to NULL in case the user aborts the clarification context menu.
+diff --git a/eeschema/libeditframe.cpp b/eeschema/libeditframe.cpp
+index 3355ae829..e5813f497 100644
+--- a/eeschema/libeditframe.cpp
++++ b/eeschema/libeditframe.cpp
+@@ -1342,9 +1342,10 @@ LIB_ITEM* LIB_EDIT_FRAME::locateItem( const wxPoint& aPosition, const KICAD_T aF
+             for( int i = 0;  i < m_collectedItems.GetCount() && i < MAX_SELECT_ITEM_IDS;  i++ )
+             {
+                 wxString    text = m_collectedItems[i]->GetSelectMenuText();
++                wxString    menuText = wxString::Format( "&%d. %s", i + 1, text);
+                 BITMAP_DEF  xpm = m_collectedItems[i]->GetMenuImage();
+ 
+-                AddMenuItem( &selectMenu, ID_SELECT_ITEM_START + i, text, KiBitmap( xpm ) );
++                AddMenuItem( &selectMenu, ID_SELECT_ITEM_START + i, menuText, KiBitmap( xpm ) );
+             }
+ 
+             // Set to NULL in case user aborts the clarification context menu.
+diff --git a/eeschema/sch_field.cpp b/eeschema/sch_field.cpp
+index a141d5eb4..e83271e3e 100644
+--- a/eeschema/sch_field.cpp
++++ b/eeschema/sch_field.cpp
+@@ -464,7 +464,9 @@ void SCH_FIELD::Rotate( wxPoint aPosition )
+ wxString SCH_FIELD::GetSelectMenuText() const
+ {
+     wxString tmp;
+-    tmp.Printf( _( "Field %s" ), GetChars( GetName() ) );
++    tmp.Printf( _( "%s %s" ), 
++                GetChars( GetName() ),
++                GetChars( ShortenedShownText() ) );
+ 
+     return tmp;
+ }
+diff --git a/eeschema/sch_line.cpp b/eeschema/sch_line.cpp
+index 48c3cb397..abe3105f6 100644
+--- a/eeschema/sch_line.cpp
++++ b/eeschema/sch_line.cpp
+@@ -458,26 +458,29 @@ wxString SCH_LINE::GetSelectMenuText() const
+         orient = _("Vert.");
+     else if( m_start.y == m_end.y )
+         orient = _("Horiz.");
++    else
++        orient = _("Non-ortho.");
+ 
+     switch( m_Layer )
+     {
+     case LAYER_NOTES:
+-        txtfmt = _( "%s Graphic Line from (%s,%s) to (%s,%s)" );
++        txtfmt = _( "%s Graphic Line %s long, from (%s,%s) to (%s,%s)" );
+         break;
+ 
+     case LAYER_WIRE:
+-        txtfmt = _( "%s Wire from (%s,%s) to (%s,%s)" );
++        txtfmt = _( "%s Wire %s long, from (%s,%s) to (%s,%s)" );
+         break;
+ 
+     case LAYER_BUS:
+-        txtfmt = _( "%s Bus from (%s,%s) to (%s,%s)" );
++        txtfmt = _( "%s Bus %s long, from (%s,%s) to (%s,%s)" );
+         break;
+ 
+     default:
+-        txtfmt += _( "%s Line on Unknown Layer from (%s,%s) to (%s,%s)" );
++        txtfmt += _( "%s Line %s long, on Unknown Layer from (%s,%s) to (%s,%s)" );
+     }
+ 
+     menuText.Printf( txtfmt, GetChars( orient ),
++                     GetChars( CoordinateToString( GetLength() ) ),
+                      GetChars( CoordinateToString( m_start.x ) ),
+                      GetChars( CoordinateToString( m_start.y ) ),
+                      GetChars( CoordinateToString( m_end.x ) ),
+diff --git a/gerbview/tools/selection_tool.cpp b/gerbview/tools/selection_tool.cpp
+index f094f12c1..38bf711dd 100644
+--- a/gerbview/tools/selection_tool.cpp
++++ b/gerbview/tools/selection_tool.cpp
+@@ -646,7 +646,8 @@ EDA_ITEM* GERBVIEW_SELECTION_TOOL::disambiguationMenu( GERBER_COLLECTOR* aCollec
+         wxString text;
+         EDA_ITEM* item = ( *aCollector )[i];
+         text = item->GetSelectMenuText();
+-        menu.Add( text, i + 1 );
++        wxString menuText = wxString::Format("&%d. %s", i + 1, text );
++        menu.Add( menuText, i + 1 );
+     }
+ 
+     menu.SetTitle( _( "Clarify selection" ) );
+diff --git a/pcbnew/controle.cpp b/pcbnew/controle.cpp
+index 70cb8caef..2003cb386 100644
+--- a/pcbnew/controle.cpp
++++ b/pcbnew/controle.cpp
+@@ -240,10 +240,11 @@ BOARD_ITEM* PCB_BASE_FRAME::PcbGeneralLocateAndDisplay( int aHotKeyCode )
+             item = (*m_Collector)[i];
+ 
+             text = item->GetSelectMenuText();
++            wxString menuText = wxString::Format( "&%d. %s", i + 1, text);
+ 
+             BITMAP_DEF xpm = item->GetMenuImage();
+ 
+-            AddMenuItem( &itemMenu, ID_POPUP_PCB_ITEM_SELECTION_START + i, text, KiBitmap( xpm ) );
++            AddMenuItem( &itemMenu, ID_POPUP_PCB_ITEM_SELECTION_START + i, menuText, KiBitmap( xpm ) );
+         }
+ 
+         /* @todo: rather than assignment to true, these should be increment and decrement
+diff --git a/pcbnew/modedit.cpp b/pcbnew/modedit.cpp
+index 207d30309..e14dd9191 100644
+--- a/pcbnew/modedit.cpp
++++ b/pcbnew/modedit.cpp
+@@ -142,10 +142,11 @@ BOARD_ITEM* FOOTPRINT_EDIT_FRAME::ModeditLocateAndDisplay( int aHotKeyCode )
+ 
+             wxString    text = item->GetSelectMenuText();
+             BITMAP_DEF  xpm  = item->GetMenuImage();
++            wxString    menuText = wxString::Format( "&%d. %s", ii + 1, text);
+ 
+             AddMenuItem( &itemMenu,
+                          ID_POPUP_PCB_ITEM_SELECTION_START + ii,
+-                         text,
++                         menuText,
+                          KiBitmap( xpm ) );
+         }
+ 
+-- 
+2.11.0
+

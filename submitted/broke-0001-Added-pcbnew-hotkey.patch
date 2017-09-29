@@ -1,0 +1,70 @@
+From 1467b6c664a234c3ae2ce2330490235d990c4227 Mon Sep 17 00:00:00 2001
+From: danngreen <danngreen1@gmail.com>
+Date: Mon, 25 Sep 2017 14:30:24 -0700
+Subject: [PATCH] Added pcbnew hotkey for Update PCB from Schematic
+
+---
+ pcbnew/hotkeys.cpp          | 4 ++++
+ pcbnew/hotkeys.h            | 3 ++-
+ pcbnew/menubar_pcbframe.cpp | 7 +++++--
+ 3 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/pcbnew/hotkeys.cpp b/pcbnew/hotkeys.cpp
+index 1a8b740fd..1cfd6521d 100644
+--- a/pcbnew/hotkeys.cpp
++++ b/pcbnew/hotkeys.cpp
+@@ -231,6 +231,9 @@ static EDA_HOTKEY HkTrackDisplayMode( _HKI( "Track Display Mode" ),
+ 
+ static EDA_HOTKEY HkAddModule( _HKI( "Add Footprint" ), HK_ADD_MODULE, 'O' );
+ 
++static EDA_HOTKEY HkUpdatePcbFromSch( _HKI( "Update PCB from Schematic" ), HK_UPDATE_PCB_FROM_SCH,
++                                      WXK_F8 );
++
+ // These hotkeys work only in GAL canvas, because the legacy canvas using wxDC does not know
+ // the transparency (alpha channel)
+ static EDA_HOTKEY HkIncLayerAlhpa( _HKI( "Increment Layer Transparency" ), HK_INC_LAYER_ALHPA, '}' );
+@@ -306,6 +309,7 @@ EDA_HOTKEY* board_edit_Hotkey_List[] =
+     &HkSelectConnection,       &HkSelectCopper,
+     &HkRoutingOptions,         &HkCustomTrackWidth,          &HkDpDimension,
+     &HkViaSizeInc,             &HkViaSizeDec,
++    &HkUpdatePcbFromSch,
+     NULL
+ };
+ 
+diff --git a/pcbnew/hotkeys.h b/pcbnew/hotkeys.h
+index 271a1093e..cbef8a8f1 100644
+--- a/pcbnew/hotkeys.h
++++ b/pcbnew/hotkeys.h
+@@ -110,7 +110,8 @@ enum hotkey_id_commnand {
+     HK_CUSTOM_TRACK_WIDTH,
+     HK_DP_DIMENSIONS,
+     HK_VIA_SIZE_INC,
+-    HK_VIA_SIZE_DEC
++    HK_VIA_SIZE_DEC,
++    HK_UPDATE_PCB_FROM_SCH
+ };
+ 
+ // Full list of hotkey descriptors for board editor and footprint editor
+diff --git a/pcbnew/menubar_pcbframe.cpp b/pcbnew/menubar_pcbframe.cpp
+index f6b0e1516..657332a8e 100644
+--- a/pcbnew/menubar_pcbframe.cpp
++++ b/pcbnew/menubar_pcbframe.cpp
+@@ -366,10 +366,13 @@ void preparePlaceMenu( wxMenu* aParentMenu )
+ // Build the tools menu
+ void prepareToolsMenu( wxMenu* aParentMenu )
+ {
++    wxString text;
++
++    text = AddHotkeyName( _( "Update PCB from Schematic" ), g_Pcbnew_Editor_Hokeys_Descr, HK_UPDATE_PCB_FROM_SCH );
++
+     AddMenuItem( aParentMenu,
+                  ID_UPDATE_PCB_FROM_SCH,
+-                 _( "Update PCB from Schematic" ),
+-                 _( "Update PCB design with current schematic (forward annotation)" ),
++                 text, _( "Updates PCB design with current schematic (forward annotation)." ),
+                  KiBitmap( import_brd_file_xpm ) );
+ 
+     aParentMenu->AppendSeparator( );
+-- 
+2.11.0
+
