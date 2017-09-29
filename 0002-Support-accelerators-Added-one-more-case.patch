@@ -1,0 +1,24 @@
+From cec995fc2ffcee90ce73c07eece813dafa0be071 Mon Sep 17 00:00:00 2001
+From: danngreen <danngreen1@gmail.com>
+Date: Fri, 29 Sep 2017 16:00:15 -0700
+Subject: [PATCH 2/2] Added one more case
+
+---
+ common/hotkeys_basic.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/common/hotkeys_basic.cpp b/common/hotkeys_basic.cpp
+index bffa263e8..f5be4a28c 100644
+--- a/common/hotkeys_basic.cpp
++++ b/common/hotkeys_basic.cpp
+@@ -314,6 +314,7 @@ wxString AddHotkeyName( const wxString&           aText,
+                 switch( aShortCutType )
+                 {
+                 case IS_HOTKEY:
++                case IS_ACCELERATOR_WITHOUT_HOTKEY:
+                     msg << wxT( "\t" ) << keyname;
+                     break;
+ 
+-- 
+2.11.0
+
