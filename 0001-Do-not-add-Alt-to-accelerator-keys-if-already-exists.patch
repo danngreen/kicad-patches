@@ -1,0 +1,29 @@
+From 2d2610aabe51a2f21f818be4674f0271a5ce381c Mon Sep 17 00:00:00 2001
+From: danngreen <danngreen1@gmail.com>
+Date: Fri, 29 Sep 2017 14:49:40 -0700
+Subject: [PATCH] Do not add Alt to accelerator keys if already exists
+
+---
+ common/hotkeys_basic.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/common/hotkeys_basic.cpp b/common/hotkeys_basic.cpp
+index db69e219c..c115dfe55 100644
+--- a/common/hotkeys_basic.cpp
++++ b/common/hotkeys_basic.cpp
+@@ -229,9 +229,11 @@ static void AddModifierToKey( wxString& aFullKey, const wxString & aKey )
+     if( (aKey.Length() == 1) && (aKey[0] >= 'A')  && (aKey[0] <= 'Z'))
+         // We can use Shift+<key> as accelerator and <key> for hot key
+         aFullKey << wxT( "\t" ) << MODIFIER_SHIFT << aKey;
+-    else
++    else if ( aKey.Find( MODIFIER_ALT ) == wxNOT_FOUND )
+         // We must use Alt+<key> as accelerator and <key> for hot key
+         aFullKey << wxT( "\t" ) << MODIFIER_ALT << aKey;
++    else
++        aFullKey << wxT( "\t" ) << aKey;
+ }
+ 
+ 
+-- 
+2.11.0
+

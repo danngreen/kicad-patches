@@ -1,0 +1,62 @@
+From 94a0a2624cb726bb98d0b66e1c4cc887251f7d28 Mon Sep 17 00:00:00 2001
+From: danngreen <danngreen1@gmail.com>
+Date: Fri, 29 Sep 2017 14:46:53 -0700
+Subject: [PATCH] Support accelerators without associated hotkeys
+
+---
+ common/hotkeys_basic.cpp    | 1 +
+ include/hotkeys_basic.h     | 5 ++++-
+ pcbnew/menubar_pcbframe.cpp | 2 +-
+ 3 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/common/hotkeys_basic.cpp b/common/hotkeys_basic.cpp
+index db69e219c..bffa263e8 100644
+--- a/common/hotkeys_basic.cpp
++++ b/common/hotkeys_basic.cpp
+@@ -259,6 +259,7 @@ wxString AddHotkeyName( const wxString& aText, EDA_HOTKEY** aList,
+         switch( aShortCutType )
+         {
+         case IS_HOTKEY:
++        case IS_ACCELERATOR_WITHOUT_HOTKEY:
+             msg << wxT( "\t" ) << keyname;
+             break;
+ 
+diff --git a/include/hotkeys_basic.h b/include/hotkeys_basic.h
+index 89d229312..765785c2f 100644
+--- a/include/hotkeys_basic.h
++++ b/include/hotkeys_basic.h
+@@ -156,6 +156,8 @@ int KeyCodeFromKeyName( const wxString& keyname );
+  * In menus we can add a hot key, or an accelerator , or sometimes just a comment
+  * Hot keys can perform actions using the current mouse cursor position
+  * Accelerators perform the same action as the associated menu
++ * Accelerators do not have to have an associated hotkey, in which case they
++ * are treated differently when assigning their menu key.
+  * A comment is used in tool tips for some tools (zoom ..)
+  *    to show the hot key that performs this action
+  */
+@@ -163,7 +165,8 @@ enum HOTKEY_ACTION_TYPE
+ {
+     IS_HOTKEY,
+     IS_ACCELERATOR,
+-    IS_COMMENT
++    IS_COMMENT,
++    IS_ACCELERATOR_WITHOUT_HOTKEY
+ };
+ 
+ /**
+diff --git a/pcbnew/menubar_pcbframe.cpp b/pcbnew/menubar_pcbframe.cpp
+index 15f24dbad..f0c974d63 100644
+--- a/pcbnew/menubar_pcbframe.cpp
++++ b/pcbnew/menubar_pcbframe.cpp
+@@ -369,7 +369,7 @@ void prepareToolsMenu( wxMenu* aParentMenu )
+     wxString text;
+ 
+     text = AddHotkeyName( _( "Update PCB from Schematic" ), g_Pcbnew_Editor_Hokeys_Descr,
+-                        HK_UPDATE_PCB_FROM_SCH, IS_ACCELERATOR );
++                        HK_UPDATE_PCB_FROM_SCH, IS_ACCELERATOR_WITHOUT_HOTKEY );
+     AddMenuItem( aParentMenu,
+                  ID_UPDATE_PCB_FROM_SCH,
+                  text, _( "Updates PCB design with current schematic (forward annotation)." ),
+-- 
+2.11.0
+
